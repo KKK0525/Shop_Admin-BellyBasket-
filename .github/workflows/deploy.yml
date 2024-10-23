@@ -8,6 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_API_URL=${{secrets.REACT_APP_API_URL}}
+      DANGEROUSLY_DISABLE_HOST_CHECK=true
+      REACT_APP_URL=${{secrets.REACT_APP_API_URL}}
+
 
     steps:
       - name: Checkout code
