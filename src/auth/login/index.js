@@ -142,7 +142,7 @@ function Login() {
       sendDataToBackend();
     }
 
-  }, [authContext]); // Ensure useEffect dependency on authContext
+  }, [authContext]);
 
 return (
   <BasicLayoutLanding image={bgImage}>
