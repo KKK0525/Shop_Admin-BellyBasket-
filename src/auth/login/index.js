@@ -159,7 +159,7 @@ return (
         textAlign="center"
       >
         <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-          Sign in1
+          Sign in
         </MDTypography>
         <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
           <Grid item xs={2}>
@@ -236,7 +236,7 @@ return (
                 fontWeight="medium"
                 textGradient
               >
-                here!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                here
               </MDTypography>
             </MDTypography>
           </MDBox>
