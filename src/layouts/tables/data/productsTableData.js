@@ -12,27 +12,28 @@ export default function data(searchText) {
   const [selectedProduct1, setSelectedProduct1] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
 
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await ProductService.getAll(searchText); // Pass searchText here
-        setProducts(response?.products);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const response = await ProductService.getAll(searchText); // Pass searchText here
+  //       setProducts(response?.products);
+  //     } catch (error) {
+  //       console.error('Error fetching products:', error);
+  //     }
+  //   };
 
-    fetchProducts();
-  }, [searchText]);
+  //   fetchProducts();
+  // }, [searchText]);
 
-  // const fetchProducts = async (text) => {
-  //   try {
-  //     const response = await ProductService.getAll(text); // Use searchText here
-  //     setProducts(response?.products);
-  //   } catch (error) {
-  //     console.error("Error fetching products:", error);
-  //   }
-  // };
+  const fetchProducts = async () => {
+    try {
+      const response = await ProductService.getAll(searchText); // Pass searchText here
+      setProducts(response?.products);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
+
   const deleteProducts = async (productId) => {
     try {
       await ProductService.delete(productId.props._id);
@@ -47,9 +48,9 @@ export default function data(searchText) {
   };
 
 
-  // useEffect(() => {
-  //   fetchProducts(searchText);
-  // }, [searchText]);
+  useEffect(() => {
+    fetchProducts(searchText);
+  }, [searchText]);
 
   const handleOpenUpdateProductModal = (product) => {
     setSelectedProduct(product);

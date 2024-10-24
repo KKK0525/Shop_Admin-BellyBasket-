@@ -8,7 +8,6 @@ class ProductService {
 
   getAll = async (searchText = "") => {
     const fetchProductsEndpoint = `/api/v1/product?search=${encodeURIComponent(searchText)}`;
-    console.log("fetchProductsEndpoint", fetchProductsEndpoint);
 
     return await HttpService.get(fetchProductsEndpoint);
   };
