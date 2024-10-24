@@ -79,7 +79,7 @@ function BasicLayout({ image, children }) {
                     width="80%"
                   >
                     <Typography variant="h3" style={{ color: "white" }}>
-                      Log in BellyBasket
+                      Log in BellyBasketdddddd
                     </Typography>
                   </MDBox>
                 </MDBox>
