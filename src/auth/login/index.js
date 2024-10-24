@@ -1,41 +1,31 @@
 import { useContext, useState, useEffect } from "react";
-
-// react-router-dom components
-import { Link } from "react-router-dom";
-
-// @mui material components
+import { Link, useLocation } from "react-router-dom";
 import Card from "@mui/material/Card";
 import Switch from "@mui/material/Switch";
 import Grid from "@mui/material/Grid";
 import MuiLink from "@mui/material/Link";
-
-// @mui icons
 import FacebookIcon from "@mui/icons-material/Facebook";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import GoogleIcon from "@mui/icons-material/Google";
+import { notification } from "antd";  // Importing antd notification
 
-// Material Dashboard 2 React components
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import MDInput from "components/MDInput";
 import MDButton from "components/MDButton";
-
-// Authentication layout components
 import BasicLayoutLanding from "layouts/authentication/components/BasicLayoutLanding";
-
-// Images
 import bgImage from "assets/images/bg-sign-in-basic.jpeg";
 
 import AuthService from "services/auth-service";
 import { AuthContext } from "context";
-import { useLocation } from 'react-router-dom';
 import axios from "axios";
+
 function Login() {
   const authContext = useContext(AuthContext);
-
   const [user, setUser] = useState({});
-  const [credentialsErros, setCredentialsError] = useState(null);
+  const [credentialsErrors, setCredentialsError] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
+  const [loading, setLoading] = useState(false); // Add loading state
 
   const [inputs, setInputs] = useState({
     email: "",
@@ -59,18 +49,20 @@ function Login() {
   };
 
   const submitHandler = async (e) => {
-    // check rememeber me?
     e.preventDefault();
+    setLoading(true); // Start loading when the form is submitted
 
     const mailFormat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
     if (inputs.email.trim().length === 0 || !inputs.email.trim().match(mailFormat)) {
       setErrors({ ...errors, emailError: true });
+      setLoading(false); // Stop loading if validation fails
       return;
     }
 
     if (inputs.password.trim().length < 6) {
       setErrors({ ...errors, passwordError: true });
+      setLoading(false); // Stop loading if validation fails
       return;
     }
 
@@ -86,8 +78,19 @@ function Login() {
 
     try {
       const response = await AuthService.login(myData);
+      
+      // Show notification on successful sign in
+      notification.success({
+        message: 'Sign in successful!',
+        description: 'You have signed in successfully.',
+        placement: 'topRight', // You can change placement if needed
+      });
+
+      // Perform login logic here
       authContext.login(response.access_token, response.refresh_token);
+      setLoading(false); // Stop loading after successful login
     } catch (res) {
+      setLoading(false); // Stop loading if there's an error
       if (res.hasOwnProperty("message")) {
         setCredentialsError(res.message);
       } else {
@@ -95,17 +98,15 @@ function Login() {
       }
     }
 
-    return () => {
-      setInputs({
-        email: "",
-        password: "",
-      });
+    setInputs({
+      email: "",
+      password: "",
+    });
 
-      setErrors({
-        emailError: false,
-        passwordError: false,
-      });
-    };
+    setErrors({
+      emailError: false,
+      passwordError: false,
+    });
   };
 
   const [token, setToken] = useState("");
@@ -118,9 +119,6 @@ function Login() {
     setToken(tokenParam);
     setShopId(shopIdParam);
 
-    console.log("Token:", tokenParam);
-    console.log("ShopID:", shopIdParam);
-
     const sendDataToBackend = async () => {
       try {
         const response = await axios.post(`${process.env.REACT_APP_API_URL}api/v1/auth/loginAsAdmin`, {
@@ -128,9 +126,6 @@ function Login() {
           shopId: shopIdParam
         });
 
-        console.log('Backend response:', response.data);
-
-        // Assuming the backend response includes the access and refresh tokens
         authContext.login(response.data.access_token, response.data.refresh_token);
 
       } catch (error) {
@@ -144,107 +139,113 @@ function Login() {
 
   }, [authContext]);
 
-return (
-  <BasicLayoutLanding image={bgImage}>
-    <Card>
-      <MDBox
-        variant="gradient"
-        bgColor="info"
-        borderRadius="lg"
-        coloredShadow="info"
-        mx={2}
-        mt={-3}
-        p={2}
-        mb={1}
-        textAlign="center"
-      >
-        <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
-          Sign in
-        </MDTypography>
-        <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
-          <Grid item xs={2}>
-            <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-              <FacebookIcon color="inherit" />
-            </MDTypography>
-          </Grid>
-          <Grid item xs={2}>
-            <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-              <GitHubIcon color="inherit" />
-            </MDTypography>
-          </Grid>
-          <Grid item xs={2}>
-            <MDTypography component={MuiLink} href="#" variant="body1" color="white">
-              <GoogleIcon color="inherit" />
-            </MDTypography>
-          </Grid>
-        </Grid>
-      </MDBox>
-      <MDBox pt={4} pb={3} px={3}>
-        <MDBox component="form" role="form" method="POST" onSubmit={submitHandler}>
-          <MDBox mb={2}>
-            <MDInput
-              type="email"
-              label="Email"
-              fullWidth
-              value={inputs.email}
-              name="email"
-              onChange={changeHandler}
-              error={errors.emailError}
-            />
-          </MDBox>
-          <MDBox mb={2}>
-            <MDInput
-              type="password"
-              label="Password"
-              fullWidth
-              name="password"
-              value={inputs.password}
-              onChange={changeHandler}
-              error={errors.passwordError}
-            />
-          </MDBox>
-          <MDBox display="flex" alignItems="center" ml={-1}>
-            <Switch checked={rememberMe} onChange={handleSetRememberMe} />
-            <MDTypography
-              variant="button"
-              fontWeight="regular"
-              color="text"
-              onClick={handleSetRememberMe}
-              sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
-            >
-              &nbsp;&nbsp;Remember me
-            </MDTypography>
-          </MDBox>
-          <MDBox mt={4} mb={1}>
-            <MDButton variant="gradient" color="info" fullWidth type="submit">
-              sign in
-            </MDButton>
-          </MDBox>
-          {credentialsErros && (
-            <MDTypography variant="caption" color="error" fontWeight="light">
-              {credentialsErros}
-            </MDTypography>
-          )}
-          <MDBox mt={3} mb={1} textAlign="center">
-            <MDTypography variant="button" color="text">
-              Forgot your password? Reset it{" "}
-              <MDTypography
-                component={Link}
-                to="/auth/forgot-password"
-                variant="button"
-                color="info"
-                fontWeight="medium"
-                textGradient
-              >
-                here
+  return (
+    <BasicLayoutLanding image={bgImage}>
+      <Card>
+        <MDBox
+          variant="gradient"
+          bgColor="info"
+          borderRadius="lg"
+          coloredShadow="info"
+          mx={2}
+          mt={-3}
+          p={2}
+          mb={1}
+          textAlign="center"
+        >
+          <MDTypography variant="h4" fontWeight="medium" color="white" mt={1}>
+            Sign in
+          </MDTypography>
+          <Grid container spacing={3} justifyContent="center" sx={{ mt: 1, mb: 2 }}>
+            <Grid item xs={2}>
+              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
+                <FacebookIcon color="inherit" />
               </MDTypography>
-            </MDTypography>
+            </Grid>
+            <Grid item xs={2}>
+              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
+                <GitHubIcon color="inherit" />
+              </MDTypography>
+            </Grid>
+            <Grid item xs={2}>
+              <MDTypography component={MuiLink} href="#" variant="body1" color="white">
+                <GoogleIcon color="inherit" />
+              </MDTypography>
+            </Grid>
+          </Grid>
+        </MDBox>
+        <MDBox pt={4} pb={3} px={3}>
+          <MDBox component="form" role="form" method="POST" onSubmit={submitHandler}>
+            <MDBox mb={2}>
+              <MDInput
+                type="email"
+                label="Email"
+                fullWidth
+                value={inputs.email}
+                name="email"
+                onChange={changeHandler}
+                error={errors.emailError}
+              />
+            </MDBox>
+            <MDBox mb={2}>
+              <MDInput
+                type="password"
+                label="Password"
+                fullWidth
+                name="password"
+                value={inputs.password}
+                onChange={changeHandler}
+                error={errors.passwordError}
+              />
+            </MDBox>
+            <MDBox display="flex" alignItems="center" ml={-1}>
+              <Switch checked={rememberMe} onChange={handleSetRememberMe} />
+              <MDTypography
+                variant="button"
+                fontWeight="regular"
+                color="text"
+                onClick={handleSetRememberMe}
+                sx={{ cursor: "pointer", userSelect: "none", ml: -1 }}
+              >
+                &nbsp;&nbsp;Remember me
+              </MDTypography>
+            </MDBox>
+            <MDBox mt={4} mb={1}>
+              <MDButton
+                variant="gradient"
+                color="info"
+                fullWidth
+                type="submit"
+                disabled={loading} // Disable button when loading
+              >
+                {loading ? "Signing in..." : "Sign in"} {/* Show loading text when submitting */}
+              </MDButton>
+            </MDBox>
+            {credentialsErrors && (
+              <MDTypography variant="caption" color="error" fontWeight="light">
+                {credentialsErrors}
+              </MDTypography>
+            )}
+            <MDBox mt={3} mb={1} textAlign="center">
+              <MDTypography variant="button" color="text">
+                Forgot your password? Reset it{" "}
+                <MDTypography
+                  component={Link}
+                  to="/auth/forgot-password"
+                  variant="button"
+                  color="info"
+                  fontWeight="medium"
+                  textGradient
+                >
+                  here
+                </MDTypography>
+              </MDTypography>
+            </MDBox>
           </MDBox>
         </MDBox>
-      </MDBox>
-    </Card>
-  </BasicLayoutLanding>
-);
+      </Card>
+    </BasicLayoutLanding>
+  );
 }
 
 export default Login;

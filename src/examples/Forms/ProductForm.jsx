@@ -1,4 +1,3 @@
-// examples/Forms/ProductForm.jsx
 import { notification } from "antd";
 import { useEffect, useState } from "react";
 import MDBox from "../../components/MDBox";
@@ -6,15 +5,16 @@ import MDButton from "../../components/MDButton";
 import MDInput from "../../components/MDInput";
 import MDSelect from "../../components/MDSelect/MDSelect";
 import ProductService from "../../services/product-service.js";
-// import FileUpload from "react-material-file-upload";
+
 function ProductForm({ onClose, initialProduct }) {
   const [productName, setProductName] = useState("");
   const [productDescription, setProductDescription] = useState("");
   const [productPrice, setProductPrice] = useState("");
   const [productQuantity, setProductQuantity] = useState("");
   const [productCategory, setProductCategory] = useState("");
+  const [productImage, setProductImage] = useState([]);
   const [actionName, setActionName] = useState("Create");
-  const [productImage, setProductImage] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // State to handle loading
 
   const categories = [
     "Fruits & Vegetables",
@@ -36,7 +36,7 @@ function ProductForm({ onClose, initialProduct }) {
     "Cleaning Essentials",
     "Home & Office",
     "Personal Care",
-    "Pet Care"
+    "Pet Care",
   ];
 
   useEffect(() => {
@@ -51,7 +51,8 @@ function ProductForm({ onClose, initialProduct }) {
   }, [initialProduct]);
 
   const handleSubmit = async (e) => {
-    // e.preventDefault();
+    e.preventDefault(); // Prevent default form submission behavior
+    setIsLoading(true); // Start loading state
 
     // Create a FormData object to append both the product data and the image file
     const formData = new FormData();
@@ -71,7 +72,11 @@ function ProductForm({ onClose, initialProduct }) {
           initialProduct._id,
           formData
         );
-        console.log("Product updated successfully:", response);
+        notification.success({
+          message: "Update successful!",
+          description: "Product update is successfully.",
+          placement: "topRight", // You can change placement if needed
+        });
       } else {
         if (
           !productName ||
@@ -81,30 +86,44 @@ function ProductForm({ onClose, initialProduct }) {
           !productPrice
         ) {
           notification.error({
-            message: "Please input all fields.",
+            message: "Update error!",
+            description: "Please input all fields.",
+            placement: "topRight", // You can change placement if needed
           });
+          setIsLoading(false); // Stop loading
           return;
         }
-        if (productImage.length == 0) {
+
+        if (productImage.length === 0) {
           notification.error({
-            message: "Please select product's image(s).",
+            message: "Update error!",
+            description: "Please select product's image(s).",
+            placement: "topRight", // You can change placement if needed
           });
+          setIsLoading(false); // Stop loading
           return;
         }
+
         productImage.forEach((file, index) => {
           formData.append(`images`, file);
         });
+
         // Otherwise, create a new product
         const response = await ProductService.save(formData);
         notification.success({
-          message: "Product saved successfully",
+          message: "Product create successful!",
+          description: "Product create is successful.",
+          placement: "topRight", // You can change placement if needed
         });
-        console.log("Product saved successfully:", response);
       }
 
-      onClose();
+      onClose(); // Close form after submission
     } catch (error) {
-      console.error("Error updating/saving product:", error);
+      notification.error({
+        message: "An error occurred while saving the product",
+      });
+    } finally {
+      setIsLoading(false); // Stop loading after operation is done
     }
   };
 
@@ -129,7 +148,7 @@ function ProductForm({ onClose, initialProduct }) {
             value={productDescription}
             onChange={(e) => setProductDescription(e.target.value)}
             required
-            multiline   // This makes the input behave as a textarea
+            multiline // This makes the input behave as a textarea
             rows={4}
           />
         </MDBox>
@@ -165,9 +184,8 @@ function ProductForm({ onClose, initialProduct }) {
           </MDBox>
         </MDBox>
         <MDBox mb={2}>
-          <label htmlFor="productName">Upload Product Image(s) </label>
+          <label htmlFor="productImage">Upload Product Image(s) </label>
           <input
-            label="Category"
             type="file"
             multiple
             onChange={(e) => setProductImage(Array.from(e.target.files))}
@@ -179,11 +197,11 @@ function ProductForm({ onClose, initialProduct }) {
           variant="gradient"
           color="info"
           type="submit"
-          onClick={(e) => {
-            handleSubmit(e);
-          }}
+          onClick={(e) => handleSubmit(e)}
+          disabled={isLoading} // Disable button when loading
         >
-          {actionName}
+          {isLoading ? "Saving..." : actionName}{" "}
+          {/* Show "Saving..." when loading */}
         </MDButton>
       </MDBox>
     </div>

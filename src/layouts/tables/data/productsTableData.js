@@ -12,18 +12,6 @@ export default function data(searchText) {
   const [selectedProduct1, setSelectedProduct1] = useState(null);
   const API_URL = process.env.REACT_APP_API_URL;
 
-  // useEffect(() => {
-  //   const fetchProducts = async () => {
-  //     try {
-  //       const response = await ProductService.getAll(searchText); // Pass searchText here
-  //       setProducts(response?.products);
-  //     } catch (error) {
-  //       console.error('Error fetching products:', error);
-  //     }
-  //   };
-
-  //   fetchProducts();
-  // }, [searchText]);
 
   const fetchProducts = async () => {
     try {
