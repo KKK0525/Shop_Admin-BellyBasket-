@@ -109,6 +109,7 @@ export default function data() {
       { Header: "Products", accessor: "products", align: "left" },
       { Header: "totalPrice", accessor: "totalPrice", align: "center " },
       { Header: "status", accessor: "status", align: "center" },
+      { Header: "Create At", accessor: "Create At", align: "center" },
       { Header: "Delivery Man Info", accessor: "deliveryManInfo", align: "left" },
       {
         Header: "action",

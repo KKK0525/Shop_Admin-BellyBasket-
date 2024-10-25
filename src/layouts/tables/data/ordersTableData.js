@@ -38,7 +38,21 @@ export default function data() {
     return statusToColorAndValue[status] || { color: "default", value: 0 };
   };
 
+  const formatDateTimeWithAmPm = (dateString) => {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+    const day = String(date.getDate()).padStart(2, '0');
+    let hours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const amPm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12; // If hour is 0 (midnight), set it to 12
+    return `${year}-${month}-${day} ${String(hours).padStart(2, '0')}:${minutes} ${amPm}`;
+  };
 
+  const getCreateColorAndValue = (createdAt) => {
+    return { color: 'success' };
+  };
   const Order = ({ image, name, email, orderId }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDAvatar src={image} name={name} size="lg" />
@@ -107,6 +121,7 @@ export default function data() {
       { Header: "Products", accessor: "products", align: "left" },
       { Header: "totalPrice", accessor: "totalPrice", align: "center " },
       { Header: "status", accessor: "status", align: "center" },
+      { Header: "Created Date ", accessor: "CreateAt", align: "center" },
       { Header: "Delivery Man Info", accessor: "deliveryManInfo", align: "left" },
       {
         Header: "action",
@@ -195,6 +210,16 @@ export default function data() {
           <MDBadge
             badgeContent={order.status}
             color={getStatusColorAndValue(order.status).color}
+            variant="gradient"
+            size="sm"
+          />
+        </MDBox>
+      ),
+      CreateAt: (
+        <MDBox ml={-1}>
+          <MDBadge
+            badgeContent={formatDateTimeWithAmPm(order.created_at)}
+            color={getCreateColorAndValue(order.created_at).color}
             variant="gradient"
             size="sm"
           />
