@@ -166,7 +166,7 @@ export default function data() {
           </MDBox>
         ),
       },
-    ],
+    ],  
 
     rows: orders.map((order) => ({
       order: (
