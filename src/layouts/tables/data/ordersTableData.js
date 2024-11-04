@@ -8,23 +8,58 @@ import OrderService from "services/order-service";
 
 import LogoAsana from "assets/images/small-logos/logo-asana.svg";
 
-export default function data() {
+export default function data(searchText) {
   const [orders, setOrder] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
+  // const fetchOrders = async () => {
+  //   try {
+  //     console.log("Search Text:", searchText);
+  //     const response = await OrderService.getAll(searchText);
+  //     console.log("response", response);
+
+  //     setOrder(response?.orders || []);
+  //   } catch (error) {
+  //     console.error('Error fetching orders:', error);
+  //   }
+  // };
+
   const fetchOrders = async () => {
     try {
-      const response = await OrderService.getAll();
+      console.log("Search Text:", searchText);  // Log the current search text for debugging
+      const response = await OrderService.getAll();  // Fetch all orders initially
 
-      setOrder(response?.orders);
+      // Filter orders based on the customer data matching the searchText
+      const lowerCaseSearchText = searchText.toLowerCase();
+      const filteredOrders = response.orders.filter(order => {
+        const { email, phone_number, username } = order.customer;
+
+        return (
+          (email && email.toLowerCase().includes(lowerCaseSearchText)) ||
+          (phone_number && phone_number.includes(lowerCaseSearchText)) ||
+          (username && username.toLowerCase().includes(lowerCaseSearchText))
+        );
+      });
+
+      if (filteredOrders.length > 0) {
+        console.log("Matching Orders:", filteredOrders);
+
+        // Set the state to display only the filtered orders in the table
+        setOrder(filteredOrders);
+      } else {
+        console.log("No matching orders found. Displaying all orders.");
+
+        // Set all orders if no matches found
+        setOrder(response.orders || []);
+      }
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error("Error fetching orders:", error);
     }
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(searchText);
+  }, [searchText]);
 
   const statusToColorAndValue = {
     Created: { color: "error", value: 0 },
@@ -166,7 +201,7 @@ export default function data() {
           </MDBox>
         ),
       },
-    ],  
+    ],
 
     rows: orders.map((order) => ({
       order: (

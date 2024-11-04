@@ -16,6 +16,7 @@ export default function data(searchText) {
   const fetchProducts = async () => {
     try {
       const response = await ProductService.getAll(searchText); // Pass searchText here
+      console.log("response", response);
       setProducts(response?.products);
     } catch (error) {
       console.error('Error fetching products:', error);

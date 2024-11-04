@@ -1,10 +1,6 @@
 import HttpService from "./htttp.service";
 
 class ProductService {
-  // getAll = async () => {
-  //   const fetchProductsEndpoint = "/api/v1/product";
-  //   return await HttpService.get(fetchProductsEndpoint);
-  // };
 
   getAll = async (searchText = "") => {
     const fetchProductsEndpoint = `/api/v1/product?search=${encodeURIComponent(searchText)}`;

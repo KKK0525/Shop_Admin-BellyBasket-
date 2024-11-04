@@ -17,6 +17,8 @@ import UpdateProductModal from "./Product/UpdateProductModal";
 
 function Tables() {
   const searchText = useSelector((state) => state.search.searchText);
+  console.log("searchText", searchText);
+
   const {
     columns: productTableColumns,
     rows: productTableRows,
@@ -79,7 +81,7 @@ function Tables() {
                     variant="gradient"
                     color="success"
                     onClick={handleOpenCreateProductModal}
-                    sx={{ boxShadow: "none", width:'200px' }}
+                    sx={{ boxShadow: "none", width: "200px" }}
                   >
                     Create New Product
                   </MDButton>
