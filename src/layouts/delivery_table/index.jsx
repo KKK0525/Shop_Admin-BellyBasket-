@@ -1,8 +1,6 @@
 import Card from "@mui/material/Card";
 import Grid from "@mui/material/Grid";
-import {
-  Pagination
-} from "antd"; // Import Modal, DatePicker, Space, and Pagination from antd
+import { Pagination } from "antd"; // Import Modal, DatePicker, Space, and Pagination from antd
 import MDBox from "components/MDBox";
 import MDButton from "components/MDButton";
 import MDTypography from "components/MDTypography";
@@ -13,19 +11,23 @@ import DataTable from "examples/Tables/DataTable";
 import deliveryPeopleTableData from "layouts/tables/data/deliveryPeopleTableData";
 import { useState } from "react";
 import CreateDeliveryPersonModal from "./DeliveryPerson/CreateDeliveryPersonModal";
+import { useSelector } from "react-redux"; // Import useSelector
 
 import UpdateDeliveryPersonModal from "./DeliveryPerson/UpdateDeliveryPersonModal";
 
-
 function Tables() {
+  const searchText = useSelector((state) => state.search.searchText);
+  console.log("searchText", searchText);
+
   const {
     columns: deliveryPeopleTableColumns,
     rows: deliveryPeopleTableRows,
     selectedDeliveryPeople,
     onCloseUpdateDeliveryPersonModal,
-  } = deliveryPeopleTableData();
+  } = deliveryPeopleTableData(searchText);
 
-  const [isCreateDeliveryPersonModalOpen, setCreateDeliveryPersonModalOpen] = useState(false);
+  const [isCreateDeliveryPersonModalOpen, setCreateDeliveryPersonModalOpen] =
+    useState(false);
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -39,7 +41,7 @@ function Tables() {
 
   const handleOpenCreateDeliveryPersonModal = () => {
     setCreateDeliveryPersonModalOpen(true);
-  }
+  };
 
   const handleCloseCreateDeliveryPersonModal = () => {
     onCloseUpdateDeliveryPersonModal(null);
@@ -100,7 +102,10 @@ function Tables() {
               </MDBox>
               <MDBox pt={3}>
                 <DataTable
-                  table={{ columns: deliveryPeopleTableColumns, rows: paginatedRows }}
+                  table={{
+                    columns: deliveryPeopleTableColumns,
+                    rows: paginatedRows,
+                  }}
                   isSorted={false}
                   entriesPerPage={false}
                   showTotalEntries={false}
@@ -124,7 +129,6 @@ function Tables() {
           </Grid>
         </Grid>
       </MDBox>
-
 
       {/* Create Delivery Person Modal */}
       <CreateDeliveryPersonModal

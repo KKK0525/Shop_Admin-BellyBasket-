@@ -12,24 +12,9 @@ export default function data(searchText) {
   const [orders, setOrder] = useState([]);
   const [selectedOrderId, setSelectedOrderId] = useState(null);
 
-  // const fetchOrders = async () => {
-  //   try {
-  //     console.log("Search Text:", searchText);
-  //     const response = await OrderService.getAll(searchText);
-  //     console.log("response", response);
-
-  //     setOrder(response?.orders || []);
-  //   } catch (error) {
-  //     console.error('Error fetching orders:', error);
-  //   }
-  // };
-
   const fetchOrders = async () => {
     try {
-      console.log("Search Text:", searchText);  // Log the current search text for debugging
       const response = await OrderService.getAll();  // Fetch all orders initially
-
-      // Filter orders based on the customer data matching the searchText
       const lowerCaseSearchText = searchText.toLowerCase();
       const filteredOrders = response.orders.filter(order => {
         const { email, phone_number, username } = order.customer;
@@ -43,13 +28,9 @@ export default function data(searchText) {
 
       if (filteredOrders.length > 0) {
         console.log("Matching Orders:", filteredOrders);
-
-        // Set the state to display only the filtered orders in the table
         setOrder(filteredOrders);
       } else {
         console.log("No matching orders found. Displaying all orders.");
-
-        // Set all orders if no matches found
         setOrder(response.orders || []);
       }
     } catch (error) {
@@ -88,6 +69,7 @@ export default function data(searchText) {
   const getCreateColorAndValue = (createdAt) => {
     return { color: 'success' };
   };
+  
   const Order = ({ image, name, email, orderId }) => (
     <MDBox display="flex" alignItems="center" lineHeight={1}>
       <MDAvatar src={image} name={name} size="lg" />

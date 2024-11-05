@@ -1,23 +1,23 @@
 import { notification } from "antd";
-import MDAvatar from "components/MDAvatar";
-import MDBadge from "components/MDBadge";
-import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import Switch from '@mui/material/Switch';
 import { useEffect, useState } from "react";
 import DeliveryPersonService from "services/deliveryPerson-service";
 import axios from "axios";
+import Avatar from "./3.png";
+
+
 const API_URL = process.env.REACT_APP_API_URL;
 
-export default function DeliveryPeopleTableData() {
+export default function DeliveryPeopleTableData(searchText) {
   const [deliveryPeople, setDeliveryPeople] = useState([]);
   const [selectedDeliveryPeople, setSelectedDeliveryPeople] = useState(null);
   const [selectedProduct1, setSelectedProduct1] = useState(null);
 
   const fetchDeliveryPeople = async () => {
     try {
-        const response = await DeliveryPersonService.getAll();
-        setDeliveryPeople(response?.data);
+      const response = await DeliveryPersonService.getAll(searchText);
+      setDeliveryPeople(response?.data);
     } catch (error) {
       console.error("Error fetching delivery people:", error);
     }
@@ -25,34 +25,34 @@ export default function DeliveryPeopleTableData() {
 
   const deleteDeliveryPeople = async (personEmail) => {
     try {
-        const token = localStorage.getItem("token");
+      const token = localStorage.getItem("token");
 
-        const response = await axios.delete(
-            `${API_URL}api/v1/users/deleteDeliveryPerson/${personEmail}`,
-            {
-                headers: {
-                    'authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            }
-        );
+      const response = await axios.delete(
+        `${API_URL}api/v1/users/deleteDeliveryPerson/${personEmail}`,
+        {
+          headers: {
+            'authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
-        console.log(response.data);
-        
+      console.log(response.data);
 
-        notification.success({
-            message: "deleted successfully",
-        });
 
-        fetchDeliveryPeople();
+      notification.success({
+        message: "deleted successfully",
+      });
+
+      fetchDeliveryPeople();
     } catch (error) {
-        console.error("Error fetching delivery people:", error);
+      console.error("Error fetching delivery people:", error);
     }
   };
 
   useEffect(() => {
-    fetchDeliveryPeople();
-  }, []);
+    fetchDeliveryPeople(searchText);
+  }, [searchText]);
 
   const handleOpenUpdateProductModal = (product) => {
     setSelectedDeliveryPeople(product);
@@ -74,6 +74,7 @@ export default function DeliveryPeopleTableData() {
 
   return {
     columns: [
+      { Header: "avatar", accessor: "avatar", align: "left", width: '50px', padding: '0px' },
       { Header: "email", accessor: "email", align: "left" },
       { Header: "name", accessor: "name", align: "left" },
       { Header: "phone number", accessor: "phonenumber", align: "left" },
@@ -115,7 +116,7 @@ export default function DeliveryPeopleTableData() {
             color="text"
             fontWeight="medium"
             onClick={() => {
-                deleteDeliveryPeople(row.original.email);
+              deleteDeliveryPeople(row.original.email);
             }}
           >
             Delete
@@ -125,43 +126,57 @@ export default function DeliveryPeopleTableData() {
     ],
 
     rows: deliveryPeople.map((deliveryPerson) => ({
-        email: deliveryPerson.email,
-        name: deliveryPerson.first_name + " " + deliveryPerson.last_name,
-        phonenumber: deliveryPerson.phone_number,
-        isVerified: (
-            <Switch
-            checked={deliveryPerson.isVerified}
-            inputProps={{ 'aria-label': 'controlled' }}
-            />
-        ),
-        action: (
-            <MDTypography
-            component="a"
-            href="#"
-            variant="caption"
-            color="text"
-            fontWeight="medium"
-            onClick={() => {
-                handleOpenUpdateProductModal(deliveryPerson);
-            }}
-            >
-            Edit
+      avatar: (
+        <div style={{ display: 'flex', alignItems: 'center' }}>
+          <img
+            src={Avatar}
+            alt="Delivery Person Avatar"
+            style={{ width: '50px', height: '50px', borderRadius: '8px', marginRight: '10px' }}
+          />
+          <div>
+            <MDTypography variant="caption" fontWeight="medium">
+              {deliveryPerson.first_name + " " + deliveryPerson.last_name}
             </MDTypography>
-        ),
-        delete: (
-            <MDTypography
-            component="a"
-            href="#"
-            variant="caption"
-            color="text"
-            fontWeight="medium"
-            onClick={() => {
-                deleteDeliveryPeople(deliveryPerson.email);
-            }}
-            >
-            Delete
-            </MDTypography>
-        ),
+          </div>
+        </div>
+      ),
+      email: deliveryPerson.email,
+      name: deliveryPerson.first_name + " " + deliveryPerson.last_name,
+      phonenumber: deliveryPerson.phone_number,
+      isVerified: (
+        <Switch
+          checked={deliveryPerson.isVerified}
+          inputProps={{ 'aria-label': 'controlled' }}
+        />
+      ),
+      action: (
+        <MDTypography
+          component="a"
+          href="#"
+          variant="caption"
+          color="text"
+          fontWeight="medium"
+          onClick={() => {
+            handleOpenUpdateProductModal(deliveryPerson);
+          }}
+        >
+          Edit
+        </MDTypography>
+      ),
+      delete: (
+        <MDTypography
+          component="a"
+          href="#"
+          variant="caption"
+          color="text"
+          fontWeight="medium"
+          onClick={() => {
+            deleteDeliveryPeople(deliveryPerson.email);
+          }}
+        >
+          Delete
+        </MDTypography>
+      ),
     })),
     selectedDeliveryPeople,
     onCloseUpdateDeliveryPersonModal: handleCloseUpdateDeliveryPersonModal,

@@ -1,6 +1,5 @@
 import { notification } from "antd";
 import MDAvatar from "components/MDAvatar";
-import MDBadge from "components/MDBadge";
 import MDBox from "components/MDBox";
 import MDTypography from "components/MDTypography";
 import { useEffect, useState } from "react";

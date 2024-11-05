@@ -1,8 +1,8 @@
 import HttpService from "./htttp.service";
 
 class DeliveryPersonService {
-  getAll = async () => {
-    const fetchOrderssEndpoint = '/api/v1/users/getDeliveryPeople';
+  getAll = async (searchText = "") => {
+    const fetchOrderssEndpoint = `/api/v1/users/getDeliveryPeople?search=${encodeURIComponent(searchText)}`;
     return await HttpService.get(fetchOrderssEndpoint);
   };
   getAllCounts = async () => {
